@@ -4,9 +4,12 @@ import time
 import random
 import traceback
 
+
 class environmentException(Exception):
-    def __init__(self,error):
+    ''' class to handle exceptions of environment to avoid breaking of code '''
+    def __init__(self, error):
         self.error = error
+
     def __str__(self):
         return error
 
@@ -36,6 +39,7 @@ class roadModel():
 
 
 class agent_car():
+    ''' models an agent car '''
 
     def __init__(self, roadInstance, speed=50.0, maxSpeed=100.0):
         self.roadInst = roadInstance
@@ -44,25 +48,26 @@ class agent_car():
         self.speed = speed
         self.maxSpeed = maxSpeed
 
-    def steering(self,direction):
-
-        if direction not in ['Left','Right']:
+    def steering(self, direction):
+        ''' steer car to switch lane '''
+        if direction not in ['Left', 'Right']:
             raise environmentException(
                 "action space has only 'Left' and 'Right' as inputs")
-        
-        if (direction == 'Left') and (self.y>0):
+
+        if (direction == 'Left') and (self.y > 0):
             # IsLeftLaneEmpty
             if (self.roadInst.road[self.x, self.y-1] == 0):
-                self.y -=1    
-        elif (direction == 'Right') and (self.y<(self.roadInst.lane-1)):
+                self.y -= 1
+        elif (direction == 'Right') and (self.y < (self.roadInst.lane-1)):
             # IsRightLaneEmpty
             if (self.roadInst.road[self.x, self.y+1] == 0):
-                self.y +=1
+                self.y += 1
         else:
-            pass            
+            pass
 
 
 class traffic_car():
+    ''' models an traffic car '''
 
     def __init__(self, roadInstance, maxSpeed=100.0):
         self.roadInst = roadInstance
@@ -81,19 +86,20 @@ class traffic_car():
             if self.y in range(1, self.roadInst.lane-1):
                 IsLeftLaneEmpty = (self.roadInst.road[self.x, self.y-1] == 0)
                 IsRightLaneEmpty = (self.roadInst.road[self.x, self.y+1] == 0)
-                
-                if IsLeftLaneEmpty and IsRightLaneEmpty :
-                    self.y += [-1,1][random.randint(0,1)]
+
+                if IsLeftLaneEmpty and IsRightLaneEmpty:
+                    self.y += [-1, 1][random.randint(0, 1)]
                 elif IsLeftLaneEmpty:
-                    self.y -=1
+                    self.y -= 1
                 elif IsRightLaneEmpty:
-                    self.y +=1
-         
-            elif (self.y==0) and (self.roadInst.road[self.x, self.y+1] == 0):        
+                    self.y += 1
+
+            elif (self.y == 0) and (self.roadInst.road[self.x, self.y+1] == 0):
                 self.y += 1
-            elif (self.y==(self.roadInst.lane-1)) and (self.roadInst.road[self.x, self.y-1] == 0):        
+            elif (self.y == (self.roadInst.lane-1)) and (
+                    self.roadInst.road[self.x, self.y-1] == 0):
                 self.y -= 1
-            
+
             else:
                 # wait for room and change lane later
                 pass
@@ -107,6 +113,7 @@ class traffic_car():
 
 
 class trafficModel():
+    ''' Single way multi-lane traffic model '''
 
     def __init__(self, traffic_car, roadInstance, space_bet_vehicles=3):
         self.CarsList = []
@@ -116,6 +123,8 @@ class trafficModel():
         self.carsPassed = 0
 
     def updateTraffic(self, iteration):
+
+        # if there is no car in queue, add traffic car
         if len(self.CarsList) == 0:
             self.CarsList.append(
                 self.traffic_car(self.roadInstance))
@@ -124,6 +133,7 @@ class trafficModel():
             self.CarsList.append(
                 self.traffic_car(self.roadInstance))
 
+        # if the car has passed the simulator window, remove instance from list
         for everyCar in self.CarsList:
             if everyCar.speed == 0:
                 self.CarsList.pop(
@@ -144,28 +154,29 @@ class trafficModel():
 
 class environment():
     ''' openAI gym like environment '''
+
     def __init__(self):
         newRoad = roadModel()
         agentCar = agent_car(newRoad)
         traffic = trafficModel(traffic_car, newRoad)
         iteration = 0
         self.done = False
-    
+
     def reset(self):
-        pass    
-    
+        pass
+
     def observation(self):
         pass
 
     def reward(self):
         return traffic.carsPassed
-    
+
     def done(self):
         return self.done
 
     def info(self):
-        return {'info':'some info'}    
-    
+        return {'info': 'some info'}
+
 
 #--------------------------------------------------#
 
@@ -185,7 +196,7 @@ if __name__ == '__main__':
         # except:
         #         traceback.print_exc()
         #         print "Game Over"
-        #         exit()    
+        #         exit()
         print "iteration", iteration
         print "carsPassed", traffic.carsPassed
         iteration += 1
