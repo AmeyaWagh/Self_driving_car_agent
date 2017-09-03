@@ -1,6 +1,8 @@
 import numpy as np
 import os
 import time
+
+
 board = np.zeros((20,5),dtype = 'float')
 #board of size (20,5)
 #velocity of agent in the range 0-100 
