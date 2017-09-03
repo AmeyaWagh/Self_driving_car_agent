@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import time
+import random
 
 
 class roadModel():
@@ -54,10 +55,16 @@ class traffic_car():
             # check if you have lanes free to change
             # car cannot go left if in lane 0 and right if in lane 4
             if self.y in range(1, self.roadInst.lane-1):
-                if self.roadInst.road[self.x, self.y-1] == 0:
-                    self.y -= 1
-                elif self.roadInst.road[self.x, self.y+1] == 0:
-                    self.y += 1
+                IsLeftLaneEmpty = (self.roadInst.road[self.x, self.y-1] == 0)
+                IsRightLaneEmpty = (self.roadInst.road[self.x, self.y+1] == 0)
+                
+                if IsLeftLaneEmpty and IsRightLaneEmpty :
+                    self.y += [-1,1][random.randint(0,1)]
+                elif IsLeftLaneEmpty:
+                    self.y -=1
+                elif IsRightLaneEmpty:
+                    self.y +=1
+         
             elif (self.y==0) and (self.roadInst.road[self.x, self.y+1] == 0):        
                 self.y += 1
             elif (self.y==(self.roadInst.lane-1)) and (self.roadInst.road[self.x, self.y-1] == 0):        
