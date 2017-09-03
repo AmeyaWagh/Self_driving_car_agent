@@ -28,18 +28,18 @@ class roadModel():
 class agent_car():
 
     def __init__(self, roadInstance):
-        self.road = roadInstance
+        self.roadInst = roadInstance
         self.x = 10
-        self.y = np.random.randint(0, self.road.lane)
+        self.y = np.random.randint(0, self.roadInst.lane)
         self.speed = 50.0
 
 
 class traffic_car():
 
     def __init__(self, roadInstance):
-        self.road = roadInstance
+        self.roadInst = roadInstance
         self.x = roadInstance.road_length-1
-        self.y = np.random.randint(0, self.road.lane)
+        self.y = np.random.randint(0, self.roadInst.lane)
         self.speed = 50.0
 
     def iterate(self):
@@ -47,6 +47,12 @@ class traffic_car():
             self.x -= 1
         else:
             self.speed = 0
+
+        if self.roadInst.road[self.x-1,self.y]>0:
+            if self.roadInst.road[self.x,self.y-1]==0:
+                self.y -=1                
+            elif self.roadInst.road[self.x,self.y+1]==0:
+                self.y +=1                
 
 
 class trafficModel():
@@ -56,6 +62,7 @@ class trafficModel():
         self.roadInstance = roadInstance
         self.traffic_car = traffic_car
         self.space_bet_vehicles=space_bet_vehicles
+        self.carsPassed = 0
 
     def updateTraffic(self,iteration):
         if len(self.CarsList)==0:
@@ -70,7 +77,19 @@ class trafficModel():
             if everyCar.speed == 0:
                 self.CarsList.pop(
                     self.CarsList.index(everyCar))
-            everyCar.iterate()                
+            
+            lastPos = everyCar.x 
+            
+            everyCar.iterate()
+            
+            currPos = everyCar.x
+            
+            if (lastPos==10) and (currPos==9):
+                self.carsPassed -= 1
+            
+            elif (lastPos==9) and (currPos==10):
+                self.carsPassed += 1
+
     
 
 
@@ -78,9 +97,7 @@ class trafficModel():
 
 if __name__ == '__main__':
     newRoad = roadModel()
-    # newRoad.displayRoad()
     agentCar = agent_car(newRoad)
-    # trafficCar = traffic_car(newRoad)
     traffic = trafficModel(traffic_car,newRoad)
     iteration = 0
 
@@ -88,9 +105,8 @@ if __name__ == '__main__':
         time.sleep(0.5)
         newRoad.updateRoad(agentCar, traffic.CarsList)
         traffic.updateTraffic(iteration)
-        # newRoad.updateRoad(trafficCar)
-        # trafficCar.iterate()
         newRoad.displayRoad()
         print "iteration", iteration
+        print "carsPassed",traffic.carsPassed
         iteration += 1
-        print "trafficCars",traffic.CarsList
+        # print "trafficCars",traffic.CarsList
