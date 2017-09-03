@@ -143,9 +143,30 @@ class trafficModel():
 
 
 class environment():
-
+    ''' openAI gym like environment '''
     def __init__(self):
+        newRoad = roadModel()
+        agentCar = agent_car(newRoad)
+        traffic = trafficModel(traffic_car, newRoad)
+        iteration = 0
+        self.done = False
+    
+    def reset(self):
+        pass    
+    
+    def observation(self):
         pass
+
+    def reward(self):
+        return traffic.carsPassed
+    
+    def done(self):
+        return self.done
+
+    def info(self):
+        return {'info':'some info'}    
+    
+
 #--------------------------------------------------#
 
 if __name__ == '__main__':
@@ -159,12 +180,12 @@ if __name__ == '__main__':
         newRoad.updateRoad(agentCar, traffic.CarsList)
         traffic.updateTraffic(iteration)
         newRoad.displayRoad()
-        try:
-            agentCar.steering(['Left','Right'][random.randint(0,1)])
-        except:
-                traceback.print_exc()
-                print "Game Over"
-                exit()    
+        # try:
+        #     agentCar.steering(['Left','Right'][random.randint(0,1)])
+        # except:
+        #         traceback.print_exc()
+        #         print "Game Over"
+        #         exit()    
         print "iteration", iteration
         print "carsPassed", traffic.carsPassed
         iteration += 1
