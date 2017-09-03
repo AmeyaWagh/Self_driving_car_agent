@@ -15,8 +15,8 @@ class agent():
 	def __init__(self,board):
 		self.x = 10
 		self.y = 2
-		self.velocity = 50 
-		board[self.x , self.y ] = self.velocity
+		self.velocity = 50
+		board[self.x , self.y] = self.velocity
 
 class traffic_vechile():
 	def __init__(self,board):
@@ -31,6 +31,7 @@ class traffic_vechile():
 			board[self.x , self.y ] = 50
 		else:
 			board[self.x , self.y ] = 0	
+
 		if( self.x > 0 ):
 			self.x -= 1
 			board[self.x , self.y ] = self.velocity
@@ -48,12 +49,17 @@ if __name__ == '__main__':
 	iteration = 0
 	traffic_vechile_count = 0
 	tf_vechile = []
+
 	while (1):
 		if (iteration % space_bet_vechiles == 0):
 			tf_vechile.append(traffic_vechile(board))
+		
 		for i in range(len(tf_vechile)):	
 			tf_vechile[i].iterate(board)
+		
 		print board
+		print "iteration-",iteration
+		print "tf_vechile-",tf_vechile
 		time.sleep(0.5)
 		os.system('clear')
 		iteration += 1
