@@ -2,6 +2,13 @@ import numpy as np
 import os
 import time
 import random
+import traceback
+
+class environmentException(Exception):
+    def __init__(self,error):
+        self.error = error
+    def __str__(self):
+        return error
 
 
 class roadModel():
@@ -36,6 +43,23 @@ class agent_car():
         self.y = np.random.randint(0, self.roadInst.lane)
         self.speed = speed
         self.maxSpeed = maxSpeed
+
+    def steering(self,direction):
+
+        if direction not in ['Left','Right']:
+            raise environmentException(
+                "action space has only 'Left' and 'Right' as inputs")
+        
+        if (direction == 'Left') and (self.y>0):
+            # IsLeftLaneEmpty
+            if (self.roadInst.road[self.x, self.y-1] == 0):
+                self.y -=1    
+        elif (direction == 'Right') and (self.y<(self.roadInst.lane-1)):
+            # IsRightLaneEmpty
+            if (self.roadInst.road[self.x, self.y+1] == 0):
+                self.y +=1
+        else:
+            pass            
 
 
 class traffic_car():
@@ -135,6 +159,12 @@ if __name__ == '__main__':
         newRoad.updateRoad(agentCar, traffic.CarsList)
         traffic.updateTraffic(iteration)
         newRoad.displayRoad()
+        try:
+            agentCar.steering(['Left','Right'][random.randint(0,1)])
+        except:
+                traceback.print_exc()
+                print "Game Over"
+                exit()    
         print "iteration", iteration
         print "carsPassed", traffic.carsPassed
         iteration += 1
